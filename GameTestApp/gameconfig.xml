@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<GameConfig>
+	<World>
+		<MaxX>10</MaxX>
+		<MaxY>10</MaxY>
+
+		<Creatures>
+			<Creature>
+				<Name>Goblin</Name>
+				<HitPoint>100</HitPoint>
+				<X>2</X>
+				<Y>3</Y>
+				<Defences>
+					<DefenceItem>
+						<Name>Leather Armor</Name>
+						<ReduceHitPoint>10</ReduceHitPoint>
+					</DefenceItem>
+				</Defences>
+			</Creature>
+			<Creature>
+				<Name>Orc</Name>
+				<HitPoint>120</HitPoint>
+				<X>5</X>
+				<Y>5</Y>
+				<Defences>
+					<DefenceItem>
+						<Name>Chainmail</Name>
+						<ReduceHitPoint>10</ReduceHitPoint>
+					</DefenceItem>
+				</Defences>
+			</Creature>
+		</Creatures>
+
+		<WorldObjects>
+			<AttackItem>
+				<Name>Bow</Name>
+				<Hit>15</Hit>
+				<Range>5</Range>
+				<Lootable>true</Lootable>
+				<Removable>true</Removable>
+				<X>2</X>
+				<Y>3</Y>
+			</AttackItem>
+		</WorldObjects>
+	</World>
+</GameConfig>
