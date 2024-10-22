@@ -28,6 +28,7 @@ namespace Richard2DGameFramework.Configuration
             {
                 configDoc.Load(filename);
                 logger.LogInfo($"Indlæser konfigurationsfil: {filename}");
+                logger.LogInfo($"Roden i XML: {configDoc.DocumentElement.Name}");
             }
             catch (Exception ex)
             {
@@ -35,8 +36,8 @@ namespace Richard2DGameFramework.Configuration
                 throw;
             }
 
-            // Læs World elementet først for at få MaxX og MaxY
-            XmlNode worldNode = configDoc.DocumentElement.SelectSingleNode("World");
+            // Brug XPath til at finde <World> elementet uanset hvor det er i dokumentet
+            XmlNode worldNode = configDoc.SelectSingleNode("//World");
             if (worldNode == null)
             {
                 logger.LogError("World-konfiguration ikke fundet i XML-filen.");
@@ -61,7 +62,7 @@ namespace Richard2DGameFramework.Configuration
 
             // Læs Creatures
             XmlNodeList creatureNodes = worldNode.SelectNodes("Creatures/Creature");
-            if (creatureNodes == null)
+            if (creatureNodes == null || creatureNodes.Count == 0)
             {
                 logger.LogWarning("Ingen skabninger fundet i konfigurationsfilen.");
             }
@@ -81,9 +82,7 @@ namespace Richard2DGameFramework.Configuration
                             Name = name,
                             HitPoint = hitPoint,
                             X = x,
-                            Y = y,
-                            Attacks = new List<AttackItem>(), // Initialiser som tom liste
-                            Defences = new List<DefenceItem>()
+                            Y = y
                         };
 
                         // Læs Defences
@@ -102,7 +101,6 @@ namespace Richard2DGameFramework.Configuration
                                     X = x, // Position af skabning
                                     Y = y
                                 };
-                                // Tilføj DefenceItem til skabningen uden logning
                                 creature.AddDefence(defenceItem);
                             }
                         }
@@ -117,9 +115,9 @@ namespace Richard2DGameFramework.Configuration
                 }
             }
 
-            // Læs WorldObjects (inklusive AttackItem og DefenceItem)
+            // Læs WorldObjects (inklusive AttackItem, DefenceItem, MagicItem)
             XmlNodeList objectNodes = worldNode.SelectNodes("WorldObjects/*");
-            if (objectNodes == null)
+            if (objectNodes == null || objectNodes.Count == 0)
             {
                 logger.LogWarning("Ingen WorldObjects fundet i konfigurationsfilen.");
             }
@@ -130,7 +128,7 @@ namespace Richard2DGameFramework.Configuration
                     try
                     {
                         WorldObject worldObject = null;
-                        string type = objectNode.Name; // F.eks. "AttackItem", "DefenceItem", "WorldObject"
+                        string type = objectNode.Name; // F.eks. "AttackItem", "DefenceItem", "MagicItem", "WorldObject"
                         string name = objectNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownObject";
                         int x = int.Parse(objectNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0");
                         int y = int.Parse(objectNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0");
@@ -160,6 +158,19 @@ namespace Richard2DGameFramework.Configuration
                                 {
                                     Name = name,
                                     ReduceHitPoint = reduceHitPoint,
+                                    X = x,
+                                    Y = y,
+                                    Lootable = lootable,
+                                    Removable = removable
+                                };
+                                break;
+
+                            case "MagicItem":
+                                int magicPower = int.Parse(objectNode.SelectSingleNode("MagicPower")?.InnerText.Trim() ?? "0");
+                                worldObject = new MagicItem
+                                {
+                                    Name = name,
+                                    MagicPower = magicPower,
                                     X = x,
                                     Y = y,
                                     Lootable = lootable,

@@ -1,6 +1,7 @@
 ﻿// File: Creature.cs
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Defence;
+using Richard2DGameFramework.Model.WorldObjects;
 
 namespace Richard2DGameFramework.Model.Creatures
 {
@@ -9,52 +10,49 @@ namespace Richard2DGameFramework.Model.Creatures
     /// </summary>
     public class Creature
     {
-        /// <summary>
-        /// Navnet på skabningen.
-        /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Antal hit points skabningen har.
-        /// </summary>
         public int HitPoint { get; set; }
-
-        /// <summary>
-        /// X-koordinaten for skabningens position.
-        /// </summary>
         public int X { get; set; }
-
-        /// <summary>
-        /// Y-koordinaten for skabningens position.
-        /// </summary>
         public int Y { get; set; }
+        public List<IAttack> Attacks { get; set; }
+        public List<IDefence> Defences { get; set; }
+        public List<MagicItem> MagicItems { get; set; }
 
         /// <summary>
-        /// Liste over angrebsobjekter skabningen har.
+        /// Konstruktor, der initialiserer listerne.
         /// </summary>
-        public List<AttackItem> Attacks { get; set; }
+        public Creature()
+        {
+            Attacks = new List<IAttack>();
+            Defences = new List<IDefence>();
+            MagicItems = new List<MagicItem>();
+        }
 
         /// <summary>
-        /// Liste over forsvarsobjekter skabningen har.
+        /// Tilføjer et angrebsobjekt til skabningens inventar.
         /// </summary>
-        public List<DefenceItem> Defences { get; set; }
-
-        /// <summary>
-        /// Tilføjer et angrebsobjekt til skabningen.
-        /// </summary>
-        /// <param name="attack">Angrebsobjektet der skal tilføjes.</param>
-        public void AddAttack(AttackItem attack)
+        /// <param name="attack">Angrebsobjektet, der skal tilføjes.</param>
+        public void AddAttack(IAttack attack)
         {
             Attacks.Add(attack);
         }
 
         /// <summary>
-        /// Tilføjer et forsvarsobjekt til skabningen.
+        /// Tilføjer et forsvarsobjekt til skabningens inventar.
         /// </summary>
-        /// <param name="defence">Forsvarsobjektet der skal tilføjes.</param>
-        public void AddDefence(DefenceItem defence)
+        /// <param name="defence">Forsvarsobjektet, der skal tilføjes.</param>
+        public void AddDefence(IDefence defence)
         {
             Defences.Add(defence);
+        }
+
+        /// <summary>
+        /// Tilføjer et magisk objekt til skabningens inventar.
+        /// </summary>
+        /// <param name="magicItem">Det magiske objekt, der skal tilføjes.</param>
+        public void AddMagic(MagicItem magicItem)
+        {
+            MagicItems.Add(magicItem);
         }
 
         public override string ToString()

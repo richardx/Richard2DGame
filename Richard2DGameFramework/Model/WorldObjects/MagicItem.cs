@@ -1,22 +1,25 @@
-﻿// File: AttackItem.cs
-using Richard2DGameFramework.Logging;
+﻿using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
-using Richard2DGameFramework.Model.WorldObjects;
 using Richard2DGameFramework.Worlds;
 
-namespace Richard2DGameFramework.Model.Attack
+namespace Richard2DGameFramework.Model.WorldObjects
 {
     /// <summary>
-    /// Repræsenterer et angrebsobjekt.
+    /// Repræsenterer et magisk objekt i verdenen.
     /// </summary>
-    public class AttackItem : WorldObject, ILootable, IAttack
+    public class MagicItem : WorldObject, ILootable
     {
-        public int Hit { get; set; }
-        public int Range { get; set; }
+        /// <summary>
+        /// Mængden af magisk kraft, som objektet har.
+        /// </summary>
+        public int MagicPower { get; set; }
 
+        /// <summary>
+        /// Overstyrer ToString-metoden for at give en detaljeret beskrivelse af MagicItem.
+        /// </summary>
         public override string ToString()
         {
-            return $"{Name} (Hit: {Hit}, Range: {Range}, Position: ({X}, {Y}), Lootable: {Lootable}, Removable: {Removable})";
+            return $"{Name} (MagicPower: {MagicPower}, Position: ({X}, {Y}), Lootable: {Lootable}, Removable: {Removable})";
         }
 
         /// <summary>
@@ -31,7 +34,7 @@ namespace Richard2DGameFramework.Model.Attack
             }
 
             logger.LogInfo($"{creature.Name} samler {Name} op.");
-            creature.AddAttack(this);
+            creature.AddMagic(this); // Tilføj det magiske objekt til Creature inventar
 
             if (Removable)
             {
