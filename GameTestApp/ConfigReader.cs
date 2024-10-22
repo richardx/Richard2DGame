@@ -1,4 +1,4 @@
-﻿// File: ConfigReader.cs
+﻿// Fil: ConfigReader.cs
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Creatures;
@@ -36,7 +36,7 @@ namespace Richard2DGameFramework.Configuration
                 throw;
             }
 
-            // Brug XPath til at finde <World> elementet uanset hvor det er i dokumentet
+            // Find <World> elementet
             XmlNode worldNode = configDoc.SelectSingleNode("//World");
             if (worldNode == null)
             {
@@ -72,18 +72,26 @@ namespace Richard2DGameFramework.Configuration
                 {
                     try
                     {
-                        string name = creatureNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "Unknown";
-                        int hitPoint = int.Parse(creatureNode.SelectSingleNode("HitPoint")?.InnerText.Trim() ?? "100");
-                        int x = int.Parse(creatureNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0");
-                        int y = int.Parse(creatureNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0");
+                        string creatureType = creatureNode.Attributes["type"]?.Value ?? "Creature";
+                        Creature creature;
 
-                        Creature creature = new Creature
+                        switch (creatureType)
                         {
-                            Name = name,
-                            HitPoint = hitPoint,
-                            X = x,
-                            Y = y
-                        };
+                            case "Goblin":
+                                creature = new Goblin();
+                                break;
+                            case "Orc":
+                                creature = new Orc();
+                                break;
+                            default:
+                                creature = new Creature();
+                                break;
+                        }
+
+                        creature.Name = creatureNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownCreature";
+                        creature.HitPoint = int.Parse(creatureNode.SelectSingleNode("HitPoint")?.InnerText.Trim() ?? "100");
+                        creature.X = int.Parse(creatureNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0");
+                        creature.Y = int.Parse(creatureNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0");
 
                         // Læs Defences
                         XmlNodeList defenceNodes = creatureNode.SelectNodes("Defences/DefenceItem");
@@ -98,8 +106,8 @@ namespace Richard2DGameFramework.Configuration
                                 {
                                     Name = defenceName,
                                     ReduceHitPoint = reduceHitPoint,
-                                    X = x, // Position af skabning
-                                    Y = y
+                                    X = creature.X,
+                                    Y = creature.Y
                                 };
                                 creature.AddDefence(defenceItem);
                             }
@@ -115,7 +123,7 @@ namespace Richard2DGameFramework.Configuration
                 }
             }
 
-            // Læs WorldObjects (inklusive AttackItem, DefenceItem, MagicItem)
+            // Læs WorldObjects direkte uden Factory Pattern
             XmlNodeList objectNodes = worldNode.SelectNodes("WorldObjects/*");
             if (objectNodes == null || objectNodes.Count == 0)
             {
@@ -127,13 +135,14 @@ namespace Richard2DGameFramework.Configuration
                 {
                     try
                     {
-                        WorldObject worldObject = null;
                         string type = objectNode.Name; // F.eks. "AttackItem", "DefenceItem", "MagicItem", "WorldObject"
                         string name = objectNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownObject";
                         int x = int.Parse(objectNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0");
                         int y = int.Parse(objectNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0");
                         bool lootable = bool.Parse(objectNode.SelectSingleNode("Lootable")?.InnerText.Trim() ?? "false");
                         bool removable = bool.Parse(objectNode.SelectSingleNode("Removable")?.InnerText.Trim() ?? "false");
+
+                        WorldObject worldObject = null;
 
                         switch (type)
                         {
