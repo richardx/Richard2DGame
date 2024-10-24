@@ -1,7 +1,10 @@
-﻿using Richard2DGameFramework.Logging;
+﻿// Fil: Creature.cs
+using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Defence;
 using Richard2DGameFramework.Model.WorldObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Richard2DGameFramework.Model.Creatures
 {
@@ -14,92 +17,21 @@ namespace Richard2DGameFramework.Model.Creatures
         public int HitPoint { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public List<IAttack> Attacks { get; set; }
-        public List<IDefence> Defences { get; set; }
-        public List<MagicItem> MagicItems { get; set; }
+        public List<IAttack> Attacks { get; set; } = new List<IAttack>();
+        public List<IDefence> Defences { get; set; } = new List<IDefence>();
+        public List<MagicItem> MagicItems { get; set; } = new List<MagicItem>();
 
-        /// <summary>
-        /// Konstruktor, der initialiserer listerne.
-        /// </summary>
-        public Creature()
-        {
-            Attacks = new List<IAttack>();
-            Defences = new List<IDefence>();
-            MagicItems = new List<MagicItem>();
-        }
+        public void AddAttack(IAttack attack) => Attacks.Add(attack);
+        public void AddDefence(IDefence defence) => Defences.Add(defence);
+        public void AddMagic(MagicItem magicItem) => MagicItems.Add(magicItem);
 
-        /// <summary>
-        /// Tilføjer et angrebsobjekt til skabningens inventar.
-        /// </summary>
-        public void AddAttack(IAttack attack)
-        {
-            Attacks.Add(attack);
-        }
-
-        /// <summary>
-        /// Tilføjer et forsvarsobjekt til skabningens inventar.
-        /// </summary>
-        public void AddDefence(IDefence defence)
-        {
-            Defences.Add(defence);
-        }
-
-        /// <summary>
-        /// Tilføjer et magisk objekt til skabningens inventar.
-        /// </summary>
-        public void AddMagic(MagicItem magicItem)
-        {
-            MagicItems.Add(magicItem);
-        }
-
-        public override string ToString()
-        {
-            return $"{Name} (HP: {HitPoint}, Position: ({X}, {Y}))";
-        }
-
-        // Template Method til at udføre et angreb
         public void PerformAttack(Creature target, ILogger logger)
         {
-            if (CanAttack(target, logger))
-            {
-                int damage = CalculateDamage(logger);
-                target.ReceiveDamage(damage, logger);
-                AfterAttack(target, logger);
-            }
-            else
-            {
-                logger.LogWarning($"{Name} kan ikke angribe {target.Name}.");
-            }
+            int damage = Attacks.Sum(a => a.Hit);
+            logger.LogInfo($"{Name} angriber {target.Name} og gør {damage} skade!");
+            target.ReceiveDamage(damage, logger);
         }
 
-        // Trin der kan overskrives af underklasser
-        protected virtual bool CanAttack(Creature target, ILogger logger)
-        {
-            // Standardimplementering: altid sand
-            return true;
-        }
-
-        protected virtual int CalculateDamage(ILogger logger)
-        {
-            // Standardimplementering: brug total skade fra angrebsobjekter
-            int totalHit = Attacks.Sum(a => a.Hit);
-            if (totalHit > 0)
-            {
-                logger.LogInfo($"{Name} angriber med samlet skade på {totalHit}.");
-            }
-            else
-            {
-                logger.LogWarning($"{Name} har ingen angrebsobjekter.");
-            }
-            return totalHit;
-        }
-
-        protected virtual void AfterAttack(Creature target, ILogger logger)
-        {
-            // Standardimplementering: gør intet
-        }
-
-        // Metode til at modtage skade
         public void ReceiveDamage(int damage, ILogger logger)
         {
             int totalDefense = Defences.Sum(d => d.ReduceHitPoint);
@@ -114,6 +46,11 @@ namespace Richard2DGameFramework.Model.Creatures
             {
                 logger.LogInfo($"{Name} er død.");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} (HP: {HitPoint}, Position: ({X}, {Y}))";
         }
     }
 }

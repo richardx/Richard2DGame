@@ -1,4 +1,4 @@
-﻿// File: Program.cs
+﻿// Fil: Program.cs
 using Microsoft.Extensions.DependencyInjection;
 using Richard2DGameFramework.Configuration;
 using Richard2DGameFramework.Logging;
@@ -61,10 +61,11 @@ namespace GameTestApp
                 world.DisplayWorldObjects();
 
                 // Skabninger angriber hinanden
-                if (world.GetCreatures().Count >= 2)
+                var creatures = world.GetCreatures();
+                if (creatures.Count >= 2)
                 {
-                    Creature creature1 = world.GetCreatures()[0];
-                    Creature creature2 = world.GetCreatures()[1];
+                    Creature creature1 = creatures[0];
+                    Creature creature2 = creatures[1];
 
                     // Skabning 1 angriber Skabning 2
                     combatService.Attack(creature1, creature2);

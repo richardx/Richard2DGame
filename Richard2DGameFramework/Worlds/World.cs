@@ -2,6 +2,8 @@
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.WorldObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Richard2DGameFramework.Worlds
 {

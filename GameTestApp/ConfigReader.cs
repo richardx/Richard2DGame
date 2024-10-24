@@ -5,6 +5,7 @@ using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.Defence;
 using Richard2DGameFramework.Model.WorldObjects;
 using Richard2DGameFramework.Worlds;
+using System;
 using System.Xml;
 
 namespace Richard2DGameFramework.Configuration
@@ -72,21 +73,7 @@ namespace Richard2DGameFramework.Configuration
                 {
                     try
                     {
-                        string creatureType = creatureNode.Attributes["type"]?.Value ?? "Creature";
-                        Creature creature;
-
-                        switch (creatureType)
-                        {
-                            case "Goblin":
-                                creature = new Goblin();
-                                break;
-                            case "Orc":
-                                creature = new Orc();
-                                break;
-                            default:
-                                creature = new Creature();
-                                break;
-                        }
+                        Creature creature = new Creature();
 
                         creature.Name = creatureNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownCreature";
                         creature.HitPoint = int.Parse(creatureNode.SelectSingleNode("HitPoint")?.InnerText.Trim() ?? "100");
@@ -113,7 +100,50 @@ namespace Richard2DGameFramework.Configuration
                             }
                         }
 
-                        world.AddCreature(creature); // Denne metode logger allerede tilføjelsen
+                        // Læs Attacks
+                        XmlNodeList attackNodes = creatureNode.SelectNodes("Attacks/AttackItem");
+                        if (attackNodes != null)
+                        {
+                            foreach (XmlNode attackNode in attackNodes)
+                            {
+                                string attackName = attackNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownAttack";
+                                int hit = int.Parse(attackNode.SelectSingleNode("Hit")?.InnerText.Trim() ?? "0");
+                                int range = int.Parse(attackNode.SelectSingleNode("Range")?.InnerText.Trim() ?? "1");
+
+                                AttackItem attackItem = new AttackItem
+                                {
+                                    Name = attackName,
+                                    Hit = hit,
+                                    Range = range,
+                                    X = creature.X,
+                                    Y = creature.Y
+                                };
+                                creature.AddAttack(attackItem);
+                            }
+                        }
+
+                        // Læs MagicItems
+                        XmlNodeList magicNodes = creatureNode.SelectNodes("MagicItems/MagicItem");
+                        if (magicNodes != null)
+                        {
+                            foreach (XmlNode magicNode in magicNodes)
+                            {
+                                string magicName = magicNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownMagic";
+                                int magicPower = int.Parse(magicNode.SelectSingleNode("MagicPower")?.InnerText.Trim() ?? "0");
+
+                                MagicItem magicItem = new MagicItem
+                                {
+                                    Name = magicName,
+                                    MagicPower = magicPower,
+                                    X = creature.X,
+                                    Y = creature.Y
+                                };
+                                creature.AddMagic(magicItem);
+                            }
+                        }
+
+                        world.AddCreature(creature);
+                        logger.LogInfo($"Tilføjet skabning: {creature.Name} til position ({creature.X},{creature.Y}).");
                     }
                     catch (Exception ex)
                     {
@@ -123,7 +153,7 @@ namespace Richard2DGameFramework.Configuration
                 }
             }
 
-            // Læs WorldObjects direkte uden Factory Pattern
+            // Læs WorldObjects
             XmlNodeList objectNodes = worldNode.SelectNodes("WorldObjects/*");
             if (objectNodes == null || objectNodes.Count == 0)
             {
@@ -203,7 +233,8 @@ namespace Richard2DGameFramework.Configuration
                                 continue; // Spring videre til næste objekt
                         }
 
-                        world.AddWorldObject(worldObject); // Denne metode logger allerede tilføjelsen
+                        world.AddWorldObject(worldObject);
+                        logger.LogInfo($"Tilføjet objekt: {worldObject.Name} til position ({worldObject.X},{worldObject.Y}).");
                     }
                     catch (Exception ex)
                     {
