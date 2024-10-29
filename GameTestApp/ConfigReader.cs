@@ -1,27 +1,16 @@
-﻿// Fil: ConfigReader.cs
-using Richard2DGameFramework.Logging;
+﻿using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.Defence;
 using Richard2DGameFramework.Model.WorldObjects;
 using Richard2DGameFramework.Worlds;
-using System;
 using System.Xml;
 
-namespace Richard2DGameFramework.Configuration
+namespace GameTestApp.Configuration
 {
-    /// <summary>
-    /// Håndterer indlæsning af spilkonfiguration fra en XML-fil.
-    /// </summary>
     public static class ConfigReader
     {
-        /// <summary>
-        /// Indlæser konfigurationsfilen og opretter verdenen baseret på dens indhold.
-        /// </summary>
-        /// <param name="filename">Stien til XML-konfigurationsfilen.</param>
-        /// <param name="logger">Logger til brug for konfigurationsaktiviteter.</param>
-        /// <returns>En instans af <see cref="World"/> initialiseret med konfigurationsdata.</returns>
-        public static World LoadConfig(string filename, ILogger logger)
+        public static World LoadConfig(string filename, ILogger logger, ICreatureFactory creatureFactory)
         {
             XmlDocument configDoc = new XmlDocument();
 
@@ -73,12 +62,14 @@ namespace Richard2DGameFramework.Configuration
                 {
                     try
                     {
-                        Creature creature = new Creature();
-
-                        creature.Name = creatureNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownCreature";
-                        creature.HitPoint = int.Parse(creatureNode.SelectSingleNode("HitPoint")?.InnerText.Trim() ?? "100");
-                        creature.X = int.Parse(creatureNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0");
-                        creature.Y = int.Parse(creatureNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0");
+                        // Opret CreatureData baseret på XML-data
+                        CreatureData creatureData = new CreatureData
+                        {
+                            Name = creatureNode.SelectSingleNode("Name")?.InnerText.Trim() ?? "UnknownCreature",
+                            HitPoint = int.Parse(creatureNode.SelectSingleNode("HitPoint")?.InnerText.Trim() ?? "100"),
+                            X = int.Parse(creatureNode.SelectSingleNode("X")?.InnerText.Trim() ?? "0"),
+                            Y = int.Parse(creatureNode.SelectSingleNode("Y")?.InnerText.Trim() ?? "0"),
+                        };
 
                         // Læs Defences
                         XmlNodeList defenceNodes = creatureNode.SelectNodes("Defences/DefenceItem");
@@ -93,10 +84,10 @@ namespace Richard2DGameFramework.Configuration
                                 {
                                     Name = defenceName,
                                     ReduceHitPoint = reduceHitPoint,
-                                    X = creature.X,
-                                    Y = creature.Y
+                                    X = creatureData.X,
+                                    Y = creatureData.Y
                                 };
-                                creature.AddDefence(defenceItem);
+                                creatureData.Defences.Add(defenceItem);
                             }
                         }
 
@@ -115,10 +106,10 @@ namespace Richard2DGameFramework.Configuration
                                     Name = attackName,
                                     Hit = hit,
                                     Range = range,
-                                    X = creature.X,
-                                    Y = creature.Y
+                                    X = creatureData.X,
+                                    Y = creatureData.Y
                                 };
-                                creature.AddAttack(attackItem);
+                                creatureData.Attacks.Add(attackItem);
                             }
                         }
 
@@ -135,12 +126,15 @@ namespace Richard2DGameFramework.Configuration
                                 {
                                     Name = magicName,
                                     MagicPower = magicPower,
-                                    X = creature.X,
-                                    Y = creature.Y
+                                    X = creatureData.X,
+                                    Y = creatureData.Y
                                 };
-                                creature.AddMagic(magicItem);
+                                creatureData.MagicItems.Add(magicItem);
                             }
                         }
+
+                        // Brug CreatureFactory til at oprette skabningen
+                        Creature creature = creatureFactory.CreateCreature(creatureData);
 
                         world.AddCreature(creature);
                         logger.LogInfo($"Tilføjet skabning: {creature.Name} til position ({creature.X},{creature.Y}).");

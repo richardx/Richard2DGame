@@ -3,8 +3,6 @@ using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Defence;
 using Richard2DGameFramework.Model.WorldObjects;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Richard2DGameFramework.Model.Creatures
 {
@@ -24,6 +22,8 @@ namespace Richard2DGameFramework.Model.Creatures
         public void AddAttack(IAttack attack) => Attacks.Add(attack);
         public void AddDefence(IDefence defence) => Defences.Add(defence);
         public void AddMagic(MagicItem magicItem) => MagicItems.Add(magicItem);
+
+        public event EventHandler<CreatureEventArgs> Died;
 
         public void PerformAttack(Creature target, ILogger logger)
         {
@@ -45,12 +45,25 @@ namespace Richard2DGameFramework.Model.Creatures
             if (HitPoint <= 0)
             {
                 logger.LogInfo($"{Name} er død.");
+                OnDied(); // Udløs Died-event
             }
+        }
+
+        // Beskyttet metode til at udløse Died-eventen
+        protected virtual void OnDied()
+        {
+            Died?.Invoke(this, new CreatureEventArgs { Creature = this });
         }
 
         public override string ToString()
         {
             return $"{Name} (HP: {HitPoint}, Position: ({X}, {Y}))";
         }
+    }
+
+    // EventArgs klasse til at sende ekstra data med eventen
+    public class CreatureEventArgs : EventArgs
+    {
+        public Creature Creature { get; set; }
     }
 }

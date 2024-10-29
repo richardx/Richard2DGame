@@ -1,6 +1,6 @@
-﻿// Fil: Program.cs
+﻿using GameTestApp.Configuration;
+using GameTestApp.Factories;
 using Microsoft.Extensions.DependencyInjection;
-using Richard2DGameFramework.Configuration;
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Services;
@@ -15,15 +15,17 @@ namespace GameTestApp
         {
             // Opsætning af Dependency Injection (DI)
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<ILogger, MyLogger>() // Registrer ILogger og implementering
-                .AddSingleton<ICombatService, CombatService>() // Registrer ICombatService og implementering
-                .AddSingleton<ILootService, LootService>() // Registrer ILootService og implementering
+                .AddSingleton<ILogger, MyLogger>()
+                .AddSingleton<ICombatService, CombatService>()
+                .AddSingleton<ILootService, LootService>()
+                .AddSingleton<ICreatureFactory, CreatureFactory>()
                 .BuildServiceProvider();
 
             // Hent tjenester fra DI-containeren
             ILogger logger = serviceProvider.GetService<ILogger>();
             ICombatService combatService = serviceProvider.GetService<ICombatService>();
             ILootService lootService = serviceProvider.GetService<ILootService>();
+            ICreatureFactory creatureFactory = serviceProvider.GetService<ICreatureFactory>();
 
             try
             {
@@ -38,12 +40,30 @@ namespace GameTestApp
                 string configFilePath = "gameconfig.xml";
 
                 // Indlæs verdenen fra XML-konfigurationsfilen
-                World world = ConfigReader.LoadConfig(configFilePath, logger);
+                World world = ConfigReader.LoadConfig(configFilePath, logger, creatureFactory);
                 logger.LogInfo($"Verden initialiseret: {world}");
 
                 // Vis starttilstand
                 world.DisplayWorldObjects();
                 world.DisplayCreatures();
+
+                // Test af angreb og død
+                Creature goblin = world.GetCreatures().Find(c => c.Name == "Goblin");
+                if (goblin == null)
+                {
+                    logger.LogError("Goblin blev ikke fundet i verdenen.");
+                }
+                else
+                {
+                    logger.LogInfo($"Goblin initial HitPoints: {goblin.HitPoint}");
+
+                    // Goblin angriber sig selv for at dræbe sig selv
+                    combatService.Attack(goblin, goblin);
+                    logger.LogInfo($"{goblin.Name} angreb sig selv for at dræbe sig selv.");
+
+                    // Vis tilstand efter selvangreb
+                    world.DisplayCreatures();
+                }
 
                 // Skabninger looter objekter på deres positioner
                 foreach (var creature in world.GetCreatures())
@@ -81,7 +101,6 @@ namespace GameTestApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fejl ved indlæsning af konfiguration: {ex.Message}");
                 logger.LogError($"Fejl ved indlæsning af konfiguration: {ex.Message}");
             }
 

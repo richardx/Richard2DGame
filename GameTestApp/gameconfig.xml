@@ -7,13 +7,13 @@
 		<Creatures>
 			<Creature>
 				<Name>Goblin</Name>
-				<HitPoint>100</HitPoint>
+				<HitPoint>10</HitPoint>
 				<X>2</X>
 				<Y>3</Y>
 				<Defences>
 					<DefenceItem>
 						<Name>Leather Armor</Name>
-						<ReduceHitPoint>10</ReduceHitPoint>
+						<ReduceHitPoint>5</ReduceHitPoint>
 					</DefenceItem>
 				</Defences>
 				<Attacks>

@@ -25,9 +25,15 @@ namespace Richard2DGameFramework.Services
         /// </summary>
         /// <param name="attacker">Den angribende skabning.</param>
         /// <param name="defender">Den forsvarende skabning.</param>
-        public void Attack(Creature attacker, Creature defender)
+        public void Attack(Creature attacker, Creature target)
         {
-            attacker.PerformAttack(defender, _logger);
+            if (attacker == null || target == null)
+            {
+                _logger.LogError("Attacker eller target er null.");
+                return;
+            }
+
+            attacker.PerformAttack(target, _logger);
         }
     }
 }

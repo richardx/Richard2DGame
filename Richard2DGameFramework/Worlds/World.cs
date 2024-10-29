@@ -2,8 +2,6 @@
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.WorldObjects;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Richard2DGameFramework.Worlds
 {
@@ -69,11 +67,25 @@ namespace Richard2DGameFramework.Worlds
             if (_creatures.Remove(creature))
             {
                 _logger.LogInfo($"Fjernet skabning: {creature.Name} fra verdenen.");
+
+                // Afmeld eventen
+                creature.Died -= Creature_Died;
             }
             else
             {
                 _logger.LogWarning($"Skabningen: {creature.Name} findes ikke i verdenen.");
             }
+        }
+
+        // Event-handler metode
+        private void Creature_Died(object sender, CreatureEventArgs e)
+        {
+            var deadCreature = e.Creature;
+
+            _logger.LogInfo($"Observer: {deadCreature.Name} er død og fjernes fra verdenen.");
+
+            // Fjern skabningen fra verdenen
+            RemoveCreature(deadCreature);
         }
 
         /// <summary>
