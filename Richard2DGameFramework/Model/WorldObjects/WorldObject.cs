@@ -1,35 +1,36 @@
 ﻿
+using Richard2DGameFramework.Logging;
+using Richard2DGameFramework.Model.Creatures;
+using Richard2DGameFramework.Worlds;
+
 namespace Richard2DGameFramework.Model.WorldObjects
 {
-    /// <summary>
-    /// Repræsenterer et objekt i verdenen.
-    /// </summary>
+
     public class WorldObject
     {
-        /// <summary>
-        /// Navnet på objektet.
-        /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// X-koordinaten for objektets position.
-        /// </summary>
         public int X { get; set; }
-
-        /// <summary>
-        /// Y-koordinaten for objektets position.
-        /// </summary>
         public int Y { get; set; }
-
-        /// <summary>
-        /// Angiver om objektet kan lootes.
-        /// </summary>
         public bool Lootable { get; set; }
-
-        /// <summary>
-        /// Angiver om objektet kan fjernes fra verdenen.
-        /// </summary>
         public bool Removable { get; set; }
+
+        // Template Method
+        public virtual void Loot(Creature creature, World world, ILogger logger)
+        {
+            if (!Lootable)
+            {
+                logger.LogWarning($"{Name} kan ikke samles op.");
+                return;
+            }
+
+            logger.LogInfo($"{creature.Name} samler {Name} op.");
+
+            if (Removable)
+            {
+                world.RemoveWorldObject(this);
+                logger.LogInfo($"{Name} fjernet fra verdenen.");
+            }
+        }
 
         public override string ToString()
         {

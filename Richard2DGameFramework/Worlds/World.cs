@@ -1,35 +1,21 @@
-﻿// File: World.cs
+﻿
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.WorldObjects;
 
 namespace Richard2DGameFramework.Worlds
 {
-    /// <summary>
-    /// Repræsenterer spillets verden, der indeholder skabninger og objekter.
-    /// </summary>
+
     public class World
     {
-        /// <summary>
-        /// Maksimale X-koordinat for verdenen.
-        /// </summary>
-        public int MaxX { get; set; }
 
-        /// <summary>
-        /// Maksimale Y-koordinat for verdenen.
-        /// </summary>
+        public int MaxX { get; set; }
         public int MaxY { get; set; }
 
         private readonly List<WorldObject> _worldObjects;
         private readonly List<Creature> _creatures;
         private readonly ILogger _logger;
 
-        /// <summary>
-        /// Initialiserer en ny instans af <see cref="World"/> klassen med angivne dimensioner.
-        /// </summary>
-        /// <param name="maxX">Maksimale X-koordinat.</param>
-        /// <param name="maxY">Maksimale Y-koordinat.</param>
-        /// <param name="logger">Logger til brug for verdenens aktiviteter.</param>
         public World(int maxX, int maxY, ILogger logger)
         {
             MaxX = maxX;
@@ -41,10 +27,6 @@ namespace Richard2DGameFramework.Worlds
             _logger.LogInfo($"Verden oprettet med dimensioner MaxX={MaxX}, MaxY={MaxY}.");
         }
 
-        /// <summary>
-        /// Tilføjer en skabning til verdenen, hvis positionen er inden for grænserne.
-        /// </summary>
-        /// <param name="creature">Skabningen der skal tilføjes.</param>
         public void AddCreature(Creature creature)
         {
             if (IsWithinBounds(creature.X, creature.Y))
@@ -58,10 +40,6 @@ namespace Richard2DGameFramework.Worlds
             }
         }
 
-        /// <summary>
-        /// Fjerner en skabning fra verdenen.
-        /// </summary>
-        /// <param name="creature">Skabningen der skal fjernes.</param>
         public void RemoveCreature(Creature creature)
         {
             if (_creatures.Remove(creature))
@@ -84,14 +62,10 @@ namespace Richard2DGameFramework.Worlds
 
             _logger.LogInfo($"Observer: {deadCreature.Name} er død og fjernes fra verdenen.");
 
-            // Fjern skabningen fra verdenen
+            // Fjern creature fra verdenen
             RemoveCreature(deadCreature);
         }
 
-        /// <summary>
-        /// Tilføjer et objekt til verdenen, hvis positionen er inden for grænserne.
-        /// </summary>
-        /// <param name="obj">Objektet der skal tilføjes.</param>
         public void AddWorldObject(WorldObject obj)
         {
             if (IsWithinBounds(obj.X, obj.Y))
@@ -105,10 +79,6 @@ namespace Richard2DGameFramework.Worlds
             }
         }
 
-        /// <summary>
-        /// Fjerner et objekt fra verdenen.
-        /// </summary>
-        /// <param name="obj">Objektet der skal fjernes.</param>
         public void RemoveWorldObject(WorldObject obj)
         {
             if (_worldObjects.Remove(obj))
@@ -121,42 +91,22 @@ namespace Richard2DGameFramework.Worlds
             }
         }
 
-        /// <summary>
-        /// Henter et objekt på en given position.
-        /// </summary>
-        /// <param name="x">X-koordinaten.</param>
-        /// <param name="y">Y-koordinaten.</param>
-        /// <returns>Objektet hvis fundet, ellers null.</returns>
         public WorldObject GetObjectAt(int x, int y)
         {
             return _worldObjects.FirstOrDefault(obj => obj.X == x && obj.Y == y);
         }
 
-        /// <summary>
-        /// Henter en skabning på en given position.
-        /// </summary>
-        /// <param name="x">X-koordinaten.</param>
-        /// <param name="y">Y-koordinaten.</param>
-        /// <returns>Skabningen hvis fundet, ellers null.</returns>
+
         public Creature GetCreatureAt(int x, int y)
         {
             return _creatures.FirstOrDefault(creature => creature.X == x && creature.Y == y);
         }
 
-        /// <summary>
-        /// Tjekker om en position er inden for verdenens grænser.
-        /// </summary>
-        /// <param name="x">X-koordinaten.</param>
-        /// <param name="y">Y-koordinaten.</param>
-        /// <returns>True hvis inden for grænserne, ellers false.</returns>
         private bool IsWithinBounds(int x, int y)
         {
             return x >= 0 && x <= MaxX && y >= 0 && y <= MaxY;
         }
 
-        /// <summary>
-        /// Viser alle skabninger i verdenen.
-        /// </summary>
         public void DisplayCreatures()
         {
             _logger.LogInfo("Skabninger i verdenen:");
@@ -166,9 +116,6 @@ namespace Richard2DGameFramework.Worlds
             }
         }
 
-        /// <summary>
-        /// Viser alle objekter i verdenen.
-        /// </summary>
         public void DisplayWorldObjects()
         {
             _logger.LogInfo("Objekter i verdenen:");
@@ -178,28 +125,16 @@ namespace Richard2DGameFramework.Worlds
             }
         }
 
-        /// <summary>
-        /// Henter en kopi af listen over skabninger.
-        /// </summary>
-        /// <returns>Liste over skabninger.</returns>
         public List<Creature> GetCreatures()
         {
             return new List<Creature>(_creatures);
         }
 
-        /// <summary>
-        /// Henter en kopi af listen over objekter.
-        /// </summary>
-        /// <returns>Liste over objekter.</returns>
         public List<WorldObject> GetWorldObjects()
         {
             return new List<WorldObject>(_worldObjects);
         }
 
-        /// <summary>
-        /// Returnerer en strengrepræsentation af verdenen.
-        /// </summary>
-        /// <returns>En streng, der repræsenterer verdenen.</returns>
         public override string ToString()
         {
             return $"{{MaxX={MaxX}, MaxY={MaxY}, Creatures={_creatures.Count}, WorldObjects={_worldObjects.Count}}}";

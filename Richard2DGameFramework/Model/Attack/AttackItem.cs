@@ -1,14 +1,11 @@
-﻿// File: AttackItem.cs
-using Richard2DGameFramework.Logging;
+﻿using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.WorldObjects;
 using Richard2DGameFramework.Worlds;
 
 namespace Richard2DGameFramework.Model.Attack
 {
-    /// <summary>
-    /// Repræsenterer et angrebsobjekt.
-    /// </summary>
+
     public class AttackItem : WorldObject, ILootable, IAttack
     {
         public int Hit { get; set; }
@@ -19,9 +16,6 @@ namespace Richard2DGameFramework.Model.Attack
             return $"{Name} (Hit: {Hit}, Range: {Range}, Position: ({X}, {Y}), Lootable: {Lootable}, Removable: {Removable})";
         }
 
-        /// <summary>
-        /// Implementering af Loot-metoden fra ILootable.
-        /// </summary>
         public void Loot(Creature creature, World world, ILogger logger)
         {
             if (!Lootable)
@@ -31,7 +25,7 @@ namespace Richard2DGameFramework.Model.Attack
             }
 
             logger.LogInfo($"{creature.Name} samler {Name} op.");
-            creature.AddAttack(this);
+            creature.AddAttack(this); // Tilføj angrebsobjektet til creature
 
             if (Removable)
             {

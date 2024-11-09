@@ -1,6 +1,6 @@
 ﻿using GameTestApp.Configuration;
-using GameTestApp.Factories;
 using Microsoft.Extensions.DependencyInjection;
+using Richard2DGameFramework.Factories;
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Services;
@@ -20,6 +20,7 @@ namespace GameTestApp
                 .AddSingleton<ILootService, LootService>()
                 .AddSingleton<ICreatureFactory, CreatureFactory>()
                 .BuildServiceProvider();
+            //DI-containeren sørger for at oprette instanserne og injicere de nødvendige afhængigheder automatisk.
 
             // Hent tjenester fra DI-containeren
             ILogger logger = serviceProvider.GetService<ILogger>();
@@ -49,23 +50,17 @@ namespace GameTestApp
 
                 // Test af angreb og død
                 Creature goblin = world.GetCreatures().Find(c => c.Name == "Goblin");
-                if (goblin == null)
-                {
-                    logger.LogError("Goblin blev ikke fundet i verdenen.");
-                }
-                else
-                {
-                    logger.LogInfo($"Goblin initial HitPoints: {goblin.HitPoint}");
 
-                    // Goblin angriber sig selv for at dræbe sig selv
-                    combatService.Attack(goblin, goblin);
-                    logger.LogInfo($"{goblin.Name} angreb sig selv for at dræbe sig selv.");
+                logger.LogInfo($"Goblin initial HitPoints: {goblin.HitPoint}");
 
-                    // Vis tilstand efter selvangreb
-                    world.DisplayCreatures();
-                }
+                // Goblin angriber sig selv for at dræbe sig selv
+                combatService.Attack(goblin, goblin);
+                logger.LogInfo($"{goblin.Name} angreb sig selv for at dræbe sig selv.");
 
-                // Skabninger looter objekter på deres positioner
+                // Vis tilstand efter selvangreb
+                world.DisplayCreatures();
+
+                // creatures looter objekter på deres positioner
                 foreach (var creature in world.GetCreatures())
                 {
                     var objAtPosition = world.GetObjectAt(creature.X, creature.Y);

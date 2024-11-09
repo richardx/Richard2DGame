@@ -2,17 +2,9 @@
 using Richard2DGameFramework.Model.Attack;
 using Richard2DGameFramework.Model.Defence;
 using Richard2DGameFramework.Model.WorldObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Richard2DGameFramework.Model.Creatures
 {
-    /// <summary>
-    /// Interface for alle creatures.
-    /// </summary>
     public interface ICreature
     {
         string Name { get; set; }

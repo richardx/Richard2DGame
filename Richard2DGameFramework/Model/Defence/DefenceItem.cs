@@ -1,4 +1,4 @@
-﻿// File: DefenceItem.cs
+﻿
 using Richard2DGameFramework.Logging;
 using Richard2DGameFramework.Model.Creatures;
 using Richard2DGameFramework.Model.WorldObjects;
@@ -6,9 +6,7 @@ using Richard2DGameFramework.Worlds;
 
 namespace Richard2DGameFramework.Model.Defence
 {
-    /// <summary>
-    /// Repræsenterer et forsvarsobjekt.
-    /// </summary>
+
     public class DefenceItem : WorldObject, ILootable, IDefence
     {
         public int ReduceHitPoint { get; set; }
@@ -18,9 +16,6 @@ namespace Richard2DGameFramework.Model.Defence
             return $"{Name} (ReduceHitPoint: {ReduceHitPoint}, Position: ({X}, {Y}), Lootable: {Lootable}, Removable: {Removable})";
         }
 
-        /// <summary>
-        /// Implementering af Loot-metoden fra ILootable.
-        /// </summary>
         public void Loot(Creature creature, World world, ILogger logger)
         {
             if (!Lootable)
